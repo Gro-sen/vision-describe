@@ -6,3 +6,7 @@ websockets
 opencv-python
 ollama
 aiofiles
+sentence-transformers
+faiss-cpu
+tqdm
+

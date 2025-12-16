@@ -104,7 +104,7 @@
         .video-stream {
             max-width: 100%;
             max-height: 100%;
-            object-fit: contain;
+            object-fit: cover;
             border-radius: 10px;
         }
 
@@ -252,7 +252,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>🎥 基于qwen2.5vl:7b智能视频识别系统</h1>
+        <h1>安防监测系统</h1>
     </div>
 
     <div class="connection-status" id="connectionStatus">
@@ -261,7 +261,7 @@
 
     <div class="container">
         <div class="video-section">
-            <h2 class="section-title">📹 实时视频流</h2>
+            <h2 class="section-title">摄像头画面</h2>
             <div class="video-container">
                 <div class="loading pulse" id="videoLoading">正在加载视频流...</div>
                 <img src="/video_feed" alt="视频流" class="video-stream" id="videoStream" 
@@ -270,7 +270,7 @@
         </div>
 
         <div class="results-section">
-            <h2 class="section-title">🤖 识别结果</h2>
+            <h2 class="section-title">安防监控结果</h2>
             <div class="results-container" id="resultsContainer">
                 <div class="status" id="initialStatus">
                     <p>🔄 等待识别结果...</p>
