@@ -19,7 +19,7 @@ import os
 # ===================== 基础配置 =====================
 app = FastAPI(title="实时安防视频分析系统")
 
-rtsp_url = "rtsp://admin:147258369GS@192.168.1.111:554/stream1"
+rtsp_url = "rtsp://admin:147258369GS@192.168.1.101:554/stream1"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ALARM_DIR = os.path.join(BASE_DIR, "alarms")
