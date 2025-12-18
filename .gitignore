@@ -1,0 +1,29 @@
+# ===== Python =====
+__pycache__/
+*.pyc
+*.pyo
+
+# ===== 虚拟环境 =====
+.venv/
+venv/
+env/
+.conda/
+
+# ===== VS Code =====
+.vscode/
+
+# ===== 日志 / 临时文件 =====
+*.log
+*.tmp
+
+# ===== 数据 / 模型 / 权重 =====
+*.pt
+*.pth
+*.onnx
+*.ckpt
+data/
+dataset/
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db
