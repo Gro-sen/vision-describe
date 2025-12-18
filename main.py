@@ -19,7 +19,7 @@ import os
 # ===================== 基础配置 =====================
 app = FastAPI(title="实时安防视频分析系统")
 
-rtsp_url = "rtsp://admin:147258369GS@192.168.1.101:554/stream1"
+rtsp_url = "rtsp://admin:147258369GS@192.168.1.111:554/stream1"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ALARM_DIR = os.path.join(BASE_DIR, "alarms")
@@ -109,8 +109,8 @@ def decide_alarm(facts: dict):
         else:
             return "是", "严重", "人员进入禁区"
 
-    if facts["exists_badge_violation"]:
-        return "是", "一般", "存在未佩戴或无法确认工牌的人员"
+    if facts["badge_status"] in ["未佩戴", "无法确认"]:
+        return "是", "一般", "人员未佩戴或无法确认工牌"
 
     return "否", "无", "未发现安防异常"
 
@@ -127,20 +127,15 @@ def send_to_model(frame):
 
 只输出 JSON，不要解释，不要多余文字。
 
-
 格式如下：
 {
   "has_person": true/false,
-  "exists_badge_violation": true/false,
+  "badge_status": "佩戴" / "未佩戴" / "无法确认" / "不适用",
   "enter_restricted_area": true/false,
   "has_fire_or_smoke": true/false,
   "has_electric_risk": true/false,
   "scene_summary": "一句话描述画面"
 }
-
-判断原则：
-- 只要画面中【任意一人】未佩戴或无法确认工牌 → exists_badge_violation = true
-- 多人时采用“最坏情况原则”
 """
 
     resp = ollama.chat(
