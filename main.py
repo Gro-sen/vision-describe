@@ -15,6 +15,8 @@ import numpy as np
 import time
 import queue
 import os
+from playsound import playsound
+from threading import Lock
 
 # ===================== 基础配置 =====================
 app = FastAPI(title="实时安防视频分析系统")
@@ -35,6 +37,17 @@ last_infer_time = 0.0
 
 broadcast_queue = queue.Queue()
 recognition_results = []
+
+# ===================== 告警声音 =====================
+SOUND_DIR = os.path.join(BASE_DIR, "sounds")
+
+ALARM_SOUNDS = {
+    "一般": os.path.join(SOUND_DIR, "normal.mp3"),
+    "严重": os.path.join(SOUND_DIR, "severe.mp3"),
+    "紧急": os.path.join(SOUND_DIR, "critical.mp3"),
+}
+
+sound_lock = Lock()
 
 # ===================== Web =====================
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -89,6 +102,22 @@ def save_alarm_image(frame, alert_level):
     cv2.imwrite(path, frame)
     print(f"【ALARM】图片已保存：{path}")
 
+def play_alarm_sound(level: str):
+    """
+    根据告警等级播放声音（异步，不阻塞）
+    """
+    sound_path = ALARM_SOUNDS.get(level)
+    if not sound_path or not os.path.exists(sound_path):
+        return
+
+    def _play():
+        with sound_lock:   # 防止多个声音同时播
+            try:
+                playsound(sound_path)
+            except Exception as e:
+                print(f"【WARN】告警声音播放失败: {e}")
+
+    threading.Thread(target=_play, daemon=True).start()
 
 # ===================== 规则引擎（核心） =====================
 def decide_alarm(facts: dict):
@@ -170,7 +199,7 @@ def send_to_model(frame):
     # ====== ④ 告警才存图 ======
     if is_alarm == "是" and level != "无":
         save_alarm_image(frame, level)
-
+        play_alarm_sound(level)
     result = {
         "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "content": output
