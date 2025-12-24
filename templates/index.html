@@ -294,7 +294,7 @@
         function connectWebSocket() {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const wsUrl = `${protocol}//${window.location.host}/ws`;
-            
+             console.log(`尝试连接到: ${wsUrl}`);
             ws = new WebSocket(wsUrl);
 
             ws.onopen = function(event) {
@@ -304,11 +304,14 @@
             };
 
             ws.onmessage = function(event) {
+                console.log('📩 收到WebSocket消息:', event.data);
                 try {
                     const result = JSON.parse(event.data);
+                    console.log('✅ 解析成功:', result);
                     addResult(result);
                 } catch (e) {
                     console.error('解析消息失败:', e);
+                    console.log('原始数据:', event.data);
                 }
             };
 
@@ -339,15 +342,15 @@
             if (initialStatus) {
                 initialStatus.style.display = 'none';
             }
-
+            console.log('开始渲染结果:', result);  
             const resultElement = document.createElement('div');
             resultElement.className = 'result-item';
             
             // 使用 markdown 渲染器处理内容
-            const renderedContent = markdownRenderer.renderResultContent(result.content);
+            const renderedContent = markdownRenderer.renderResultContent(result);
             
             resultElement.innerHTML = `
-                <div class="result-time">🕒 ${result.time}</div>
+                <div class="result-time">🕒 ${result.timestamp || new Date().toLocaleTimeString()}</div>
                 <div class="result-content">${renderedContent}</div>
             `;
 

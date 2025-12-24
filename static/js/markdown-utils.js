@@ -39,24 +39,80 @@ class MarkdownRenderer {
     }
 
     escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-    }
-
-    renderResultContent(content) {
-        if (this.isMarkdownContent(content)) {
-            return this.createMarkdownContainer(content);
-        } else {
-            return `<div class="plain-text-result">${this.escapeHtml(content)}</div>`;
+        if (text == null || text === undefined || text === '') {
+            return '';
         }
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
-
+    renderResultContent(result) {
+        // 检查传入的是对象还是字符串
+        let content = '';
+        
+        if (typeof result === 'string') {
+            content = result;
+        } else if (typeof result === 'object' && result !== null) {
+            // 从对象中构建内容
+            content = this.buildContentFromResult(result);
+        } else {
+            content = '无内容';
+        }
+        
+        // 转义HTML
+        const escapedContent = this.escapeHtml(content);
+        
+        // 使用marked解析markdown
+        const html = marked.parse(escapedContent);
+        
+        // 返回HTML
+        return html;
+    }
+    buildContentFromResult(result) {
+        let content = '';
+        
+        // 添加视觉分析结果
+        if (result.vision_analysis) {
+            content += `**场景描述**: ${result.vision_analysis}\n\n`;
+        }
+        
+        // 添加报警信息
+        if (result.is_alarm && result.is_alarm === '是') {
+            content += `**🚨 报警状态**: ${result.alarm_level || '未知'}级报警\n\n`;
+        } else {
+            content += `**✅ 报警状态**: 无报警\n\n`;
+        }
+        
+        // 添加报警原因
+        if (result.alarm_reason) {
+            content += `**📋 报警原因**: ${result.alarm_reason}\n\n`;
+        }
+        
+        // 添加风险评估
+        if (result.risk_assessment) {
+            content += `**⚠️ 风险评估**: ${result.risk_assessment}\n\n`;
+        }
+        
+        // 添加建议
+        if (result.recommendation) {
+            content += `**💡 处置建议**: ${result.recommendation}\n\n`;
+        }
+        
+        // 添加置信度
+        if (result.confidence !== undefined) {
+            content += `**📊 置信度**: ${(result.confidence * 100).toFixed(1)}%\n\n`;
+        }
+        
+        // 添加时间戳
+        if (result.timestamp) {
+            content += `*${result.timestamp}*`;
+        }
+        
+        return content;
+    }
     createMarkdownContainer(content) {
         const toolbar = this.createToolbarHTML(content);
         const renderedContent = this.render(content);

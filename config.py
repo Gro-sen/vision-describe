@@ -60,6 +60,25 @@ class DoubleBuffer:
         with self.buffer_lock:
             self.front_buffer = self.back_buffer
 
+class ModelConfig:
+    # 视觉模型
+    VISION_MODEL = "qwen2.5vl:7b"
+    VISION_TEMPERATURE = 0.1
+    
+    # 推理语言模型
+    REASONING_MODEL = "qdeepseek-r1:1.5b"
+    REASONING_TEMPERATURE = 0.2
+    
+    # 知识库配置
+    KB_SIMILARITY_THRESHOLD = 0.8
+    KB_RETRIEVAL_TOP_K = 3
+    
+    # 报警配置
+    ALARM_CONFIDENCE_THRESHOLD = 0.6  # 置信度阈值
+
+# 导出配置
+model_config = ModelConfig()
+
 # 创建全局状态实例
 state = GlobalState()
 frame_buffer = DoubleBuffer()
